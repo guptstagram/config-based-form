@@ -2,8 +2,31 @@ import React from "react";
 import componentMap from "./FormComponents";
 import useFormStore from "../../store/form.zustand";
 
-const FormField = ({ field }) => {
-  const { formData, updateField, errors, isFieldVisible } = useFormStore();
+const FormField = ({ parents='',field }) => {
+  const { formData, updateField, errors, isFieldVisible,getFieldValue } = useFormStore();
+
+  // parentsString
+  // parentsString break by dot
+  const fieldTrace=`${parents?parents+'.':''}${field.name}`
+
+  if (field.type === "FIELDS") {
+    return (
+      <div>
+        <p>{'nested-example-->'}{field.label}</p>
+        <div>
+          {field.fields.map((field) => (
+            !field.hide && (
+              <FormField
+                key={field.name}
+                parents={fieldTrace}
+                field={field}
+              />
+            )
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (!isFieldVisible(field)) {
     return null;
@@ -16,12 +39,17 @@ const FormField = ({ field }) => {
     return null;
   }
 
+  console.log("A____",getFieldValue(field.name))
+
   return (
     <Component
-      field={field}
-      value={formData[field.name]}
+    field={{
+      ...field,
+      name: fieldTrace,
+    }}
+      value={getFieldValue(fieldTrace)}
       onChange={updateField}
-      error={errors[field.name]}
+      error={errors[fieldTrace]}
     />
   );
 };

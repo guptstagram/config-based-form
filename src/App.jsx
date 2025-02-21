@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import DynamicForm from './components/Form/DynamicForm';
 import styled from "styled-components";
 import DynamicForm from "./components/Form";
@@ -28,15 +28,32 @@ const DebugContainer = styled.div`
 
 function App() {
   const [formResult, setFormResult] = useState(null);
+  const [formConfig,setConfig]=useState(sampleFormConfig);
 
   const handleSubmit = (data) => {
     console.log("Form submitted:", data);
     setFormResult(data);
   };
 
+  const isValidConfig=(config)=>{
+    const fieldsMap={};
+    config.fields.forEach(fld => {
+      if(fieldsMap[fld.name]){
+        alert(`${fld.name} is repeating`);
+        // return false;
+      }
+      else fieldsMap[fld.name]=1;
+    });
+    return true;
+  }
+
+  useEffect(()=>{
+    isValidConfig(formConfig);
+  },[formConfig])
+
   return (
     <AppContainer>
-      <DynamicForm formConfig={sampleFormConfig} onSubmit={handleSubmit} />
+      <DynamicForm formConfig={formConfig} onSubmit={handleSubmit} />
       <DebugContainer>
         <ResultContainer
           style={{

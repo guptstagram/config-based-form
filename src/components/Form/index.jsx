@@ -41,7 +41,7 @@ const DynamicForm = ({ formConfig, onSubmit }) => {
       {formConfig.title && <FormTitle>{formConfig.title}</FormTitle>}
 
       {formConfig.fields.map((field) => (
-        <FormField key={field.name} field={field} />
+        field.hide?null:<FormField key={field.name} field={field} />
       ))}
 
       <SubmitButton type="submit">

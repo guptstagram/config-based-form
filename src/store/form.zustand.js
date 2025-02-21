@@ -4,13 +4,34 @@ const useFormStore = create((set, get) => ({
   formData: {},
   errors: {},
 
-  updateField: (fieldName, value) => {
-    set((state) => ({
-      formData: {
-        ...state.formData,
-        [fieldName]: value,
-      },
-    }));
+  getFieldValue: (fieldTrace) => {
+    const formData = get().formData;
+    if (!fieldTrace) return '';
+    if (!fieldTrace.includes('.')) {
+      return formData[fieldTrace] || '';
+    }
+    const pathArray = fieldTrace.split('.');
+    let current = formData;
+    for (const key of pathArray) {
+      if (!current || typeof current !== 'object') return '';
+      current = current[key];
+    }
+    return current || '';
+  },
+
+  updateField: (fieldTrace, value) => {
+    // console.log("A____",fieldTrace,value)
+    set(state => {
+      const newFormData = { ...state.formData };
+      const pathArray = fieldTrace.split('.');
+      let current = newFormData;
+      for (let i = 0; i < pathArray.length - 1; i++) {
+        current[pathArray[i]] = current[pathArray[i]] || {};
+        current = current[pathArray[i]];
+      }
+      current[pathArray[pathArray.length - 1]] = value;
+      return { formData: newFormData };
+    });
   },
 
   setErrors: (errors) => {
